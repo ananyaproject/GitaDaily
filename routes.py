@@ -14,7 +14,7 @@ from utils import (
     is_quiz_unlocked,
     generate_weekly_quiz,
     submit_quiz_answers,
-    get_random_shlokas
+    get_initial_shlokas
 )
 
 # Before request middleware to handle sessions
@@ -46,8 +46,8 @@ def get_current_visitor():
 @app.route('/')
 def index():
     """Main page / Landing page"""
-    # Get a few random shlokas to show on landing page
-    random_shloka = get_random_shlokas(1)[0] if Shloka.query.count() > 0 else None
+    # Get the first shloka to show on landing page
+    random_shloka = get_initial_shlokas(1)[0] if Shloka.query.count() > 0 else None
     
     return render_template(
         'index.html',
@@ -111,8 +111,8 @@ def api_daily_shlokas():
             } for s in shlokas]
         })
     else:
-        # For non-logged in users, return random shlokas
-        shlokas = get_random_shlokas(5)
+        # For non-logged in users, return initial shlokas
+        shlokas = get_initial_shlokas(5)
         
         return jsonify({
             'shlokas': [{

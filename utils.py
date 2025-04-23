@@ -31,7 +31,7 @@ def load_shlokas_from_csv():
         db.session.rollback()
 
 def get_daily_shlokas(visitor_id):
-    """Get 5 random shlokas for the day"""
+    """Get 5 consecutive shlokas for the day based on visitor's progress"""
     today = date.today()
     
     # Check if visitor already has shlokas for today
@@ -43,19 +43,60 @@ def get_daily_shlokas(visitor_id):
     if visitor_shlokas:
         # Return the shlokas that were already assigned
         shloka_ids = [vs.shloka_id for vs in visitor_shlokas]
-        return Shloka.query.filter(Shloka.id.in_(shloka_ids)).all()
+        return Shloka.query.filter(Shloka.id.in_(shloka_ids)).order_by(Shloka.id).all()
     
-    # Get all shloka IDs
-    all_shlokas = db.session.query(Shloka.id).all()
-    all_shloka_ids = [s[0] for s in all_shlokas]
+    # Determine the starting point for this visitor
+    # Get the last assigned shloka for this visitor
+    last_assigned = VisitorShloka.query.filter_by(
+        visitor_id=visitor_id
+    ).join(Shloka, VisitorShloka.shloka_id == Shloka.id).order_by(Shloka.id.desc()).first()
     
-    # Get 5 random shlokas
-    if len(all_shloka_ids) <= 5:
-        selected_ids = all_shloka_ids
+    if last_assigned:
+        # Start from the next shloka after the last one assigned
+        last_shloka_id = last_assigned.shloka_id
+        # Extract the numeric part of the ID if it's in format like 'BG1.1'
+        try:
+            # For IDs in format like 'BG1.1', split by '.' and get the values
+            if '.' in last_shloka_id:
+                last_chapter, last_verse = last_shloka_id.replace('BG', '').split('.')
+                last_chapter = int(last_chapter)
+                last_verse = int(last_verse)
+                # Start from the next verse
+                next_verse = last_verse + 1
+                next_shloka_id = f"BG{last_chapter}.{next_verse}"
+                
+                # Check if next shloka exists
+                next_shloka = Shloka.query.get(next_shloka_id)
+                if not next_shloka:
+                    # Start from the next chapter
+                    next_chapter = last_chapter + 1
+                    next_shloka_id = f"BG{next_chapter}.1"
+                    next_shloka = Shloka.query.get(next_shloka_id)
+                    if not next_shloka:
+                        # If no next chapter, start from the beginning
+                        next_shloka_id = "BG1.1"
+            else:
+                # For other formats, start from the beginning
+                next_shloka_id = "BG1.1"
+        except:
+            # If any parsing error, start from the beginning
+            next_shloka_id = "BG1.1"
     else:
-        selected_ids = random.sample(all_shloka_ids, 5)
+        # If no previous shlokas, start from the beginning
+        next_shloka_id = "BG1.1"
+    
+    # Get 5 consecutive shlokas starting from the next_shloka_id
+    selected_shlokas = Shloka.query.filter(Shloka.id >= next_shloka_id).order_by(Shloka.id).limit(5).all()
+    
+    # If we don't have 5 shlokas (might be at the end of the book), 
+    # cycle back to the beginning to get the remaining
+    if len(selected_shlokas) < 5:
+        remaining_count = 5 - len(selected_shlokas)
+        remaining_shlokas = Shloka.query.order_by(Shloka.id).limit(remaining_count).all()
+        selected_shlokas.extend(remaining_shlokas)
     
     # Save the selected shlokas for this visitor for today
+    selected_ids = [s.id for s in selected_shlokas]
     for shloka_id in selected_ids:
         visitor_shloka = VisitorShloka(
             visitor_id=visitor_id,
@@ -85,7 +126,7 @@ def get_daily_shlokas(visitor_id):
     
     db.session.commit()
     
-    return Shloka.query.filter(Shloka.id.in_(selected_ids)).all()
+    return selected_shlokas
 
 def mark_daily_progress_complete(visitor_id):
     """Mark the daily progress as complete"""
@@ -264,11 +305,7 @@ def submit_quiz_answers(quiz_id, answers):
     db.session.commit()
     return quiz
 
-def get_random_shlokas(count=5):
-    """Get random shlokas for non-authenticated users"""
-    all_shlokas = Shloka.query.all()
-    
-    if len(all_shlokas) <= count:
-        return all_shlokas
-    
-    return random.sample(all_shlokas, count)
+def get_initial_shlokas(count=5):
+    """Get sequential shlokas for non-authenticated users, starting from chapter 1"""
+    # For the landing page, always start from the beginning
+    return Shloka.query.order_by(Shloka.id).limit(count).all()
