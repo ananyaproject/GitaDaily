@@ -312,7 +312,18 @@ def submit_quiz_answers(quiz_id, answers):
 def get_initial_shlokas(count=5):
     """Get sequential shlokas for non-authenticated users, starting from chapter 1"""
     # For the landing page, always start from the beginning of chapter 1
-    # We need to ensure we get shloka IDs in the format c:1v1, c:1v2, etc.
-    first_shlokas = Shloka.query.filter(Shloka.id.like('c:1v%')).order_by(Shloka.id).limit(count).all()
-    print(f"Initial shlokas selected: {[s.id for s in first_shlokas]}")
-    return first_shlokas
+    # Get the first 5 consecutive verses from chapter 1 
+    shlokas = []
+    
+    for i in range(1, count + 1):
+        shloka_id = f"c:1v{i}"
+        shloka = Shloka.query.get(shloka_id)
+        if shloka:
+            shlokas.append(shloka)
+    
+    # If we somehow don't have enough shlokas, try a more general query
+    if len(shlokas) < count:
+        shlokas = Shloka.query.order_by(Shloka.id).limit(count).all()
+    
+    print(f"Initial shlokas selected: {[s.id for s in shlokas]}")
+    return shlokas
