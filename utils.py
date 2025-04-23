@@ -87,6 +87,7 @@ def get_daily_shlokas(visitor_id):
     
     # Get 5 consecutive shlokas starting from the next_shloka_id
     selected_shlokas = Shloka.query.filter(Shloka.id >= next_shloka_id).order_by(Shloka.id).limit(5).all()
+    print(f"Selected shlokas for visitor {visitor_id}: {[s.id for s in selected_shlokas]}")
     
     # If we don't have 5 shlokas (might be at the end of the book), 
     # cycle back to the beginning to get the remaining

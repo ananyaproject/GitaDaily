@@ -113,6 +113,7 @@ def api_daily_shlokas():
     else:
         # For non-logged in users, return initial shlokas
         shlokas = get_initial_shlokas(5)
+        print(f"Delivering these shlokas: {[s.id for s in shlokas]}")
         
         return jsonify({
             'shlokas': [{
