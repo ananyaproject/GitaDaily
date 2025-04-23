@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Gita Daily{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="mb-4">Daily Wisdom from the Bhagavad Gita</h1>
+                    <p class="lead mb-4">
+                        Start your daily journey of spiritual growth with 5 selected shlokas from the Bhagavad Gita.
+                        Read, reflect, and deepen your understanding through weekly quizzes.
+                    </p>
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <i class="fas fa-book-open"></i>
+                            <span>5 daily shlokas with translations</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Save your favorite verses</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Weekly quiz to test your knowledge</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Track your daily progress</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg mt-4">
+                        <i class="fas fa-book-open me-2"></i> Start Your Journey
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <img src="{{ url_for('static', filename='images/meditation.jpg') }}" alt="Meditation scene" class="img-fluid" onerror="this.src='https://images.unsplash.com/photo-1499728603263-13726abce5fd'">
+                </div>
+            </div>
+        </div>
+        
+        {% if random_shloka %}
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="featured-shloka text-center">
+                    <h3 class="mb-4">Shloka of the Day</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="shloka-id text-muted">{{ random_shloka.id }}</h4>
+                            <div class="shloka-sanskrit mt-3">
+                                {{ random_shloka.sanskrit }}
+                            </div>
+                            <hr>
+                            <div class="shloka-english">
+                                {{ random_shloka.english }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Get More Daily Shlokas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<section class="app-info">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-description">
+                    Gita Daily helps you develop a daily habit of reading and reflecting on the timeless wisdom of the Bhagavad Gita.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Read Daily</h3>
+                    <p>Receive 5 carefully selected shlokas each day with Sanskrit text and English translation.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Reflect & Learn</h3>
+                    <p>Contemplate the meaning and save your favorites for future reference.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Test Your Knowledge</h3>
+                    <p>Complete the weekly quiz to reinforce your understanding and track progress.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-6 mx-auto text-center">
+                <div class="email-signup-form">
+                    <h3>Get Daily Gita Notifications</h3>
+                    <p>Enter your email to receive daily shloka notifications (optional)</p>
+                    <div class="input-group">
+                        <input type="email" id="notification-email" class="form-control" placeholder="Your email address">
+                        <button id="register-email-btn" class="btn btn-primary">Subscribe</button>
+                    </div>
+                    <small class="form-text text-muted mt-2">We'll never share your email with anyone else.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Email registration
+        const emailButton = document.getElementById('register-email-btn');
+        const emailInput = document.getElementById('notification-email');
+        
+        if (emailButton && emailInput) {
+            emailButton.addEventListener('click', function() {
+                const email = emailInput.value.trim();
+                if (!email) {
+                    showNotification('Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                // Send email to backend
+                fetch('/api/email/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Email registered successfully! You will receive daily notifications.', 'success');
+                        emailInput.value = '';
+                    } else {
+                        showNotification('Failed to register email: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error registering email:', error);
+                    showNotification('An error occurred. Please try again later.', 'error');
+                });
+            });
+        }
+        
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            
+            const notificationText = notification.querySelector('.notification-text');
+            notificationText.textContent = message;
+            
+            notification.className = `notification-popup ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

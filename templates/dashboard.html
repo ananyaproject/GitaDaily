@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Your Daily Shlokas{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="page-title">Your Daily Shlokas</h1>
+                <p class="page-description">Today's wisdom from the Bhagavad Gita. Swipe or use the arrows to navigate.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="weekly-progress">
+                    <h3>Weekly Progress</h3>
+                    <div id="progress-tracker" class="progress-tracker">
+                        <!-- Progress circles will be added here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="flashcard-container">
+                    <!-- Swiper container -->
+                    <div class="swiper" id="shloka-swiper">
+                        <div class="swiper-wrapper">
+                            <!-- Flashcards will be added here by JS -->
+                        </div>
+                        
+                        <!-- Swiper navigation -->
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        
+                        <!-- Swiper pagination -->
+                        <div class="swiper-pagination"></div>
+                    </div>
+                    
+                    <div class="flashcard-actions text-center mt-4">
+                        <button id="mark-complete-btn" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i> Mark Today as Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="notification-settings mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Daily Notification</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Set a daily reminder to read your Gita shlokas:</p>
+                        <div class="input-group">
+                            <input type="time" class="form-control" id="notification-time">
+                            <button class="btn btn-primary" id="save-notification-time">
+                                <i class="fas fa-save me-2"></i> Save
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            We'll send you a notification at this time every day: "🕉️ Your shloka awaits: Shloka a day keeps maya away."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/flashcards.js') }}"></script>
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+{% endblock %}
