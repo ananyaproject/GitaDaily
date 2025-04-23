@@ -45,56 +45,59 @@ def get_daily_shlokas(visitor_id):
         shloka_ids = [vs.shloka_id for vs in visitor_shlokas]
         return Shloka.query.filter(Shloka.id.in_(shloka_ids)).order_by(Shloka.id).all()
     
-    # Determine the starting point for this visitor
     # Get the last assigned shloka for this visitor
     last_assigned = VisitorShloka.query.filter_by(
         visitor_id=visitor_id
-    ).join(Shloka, VisitorShloka.shloka_id == Shloka.id).order_by(Shloka.id.desc()).first()
+    ).join(Shloka, VisitorShloka.shloka_id == Shloka.id).order_by(VisitorShloka.date.desc(), Shloka.id.desc()).first()
     
     if last_assigned:
-        # Start from the next shloka after the last one assigned
+        # Get the last shloka's details (in c:Xv# format)
         last_shloka_id = last_assigned.shloka_id
-        # Extract the numeric part of the ID if it's in format like 'BG1.1'
+        
+        # Parse the chapter and verse from the shloka ID
         try:
-            # For IDs in format like 'BG1.1', split by '.' and get the values
-            if '.' in last_shloka_id:
-                last_chapter, last_verse = last_shloka_id.replace('BG', '').split('.')
-                last_chapter = int(last_chapter)
-                last_verse = int(last_verse)
-                # Start from the next verse
-                next_verse = last_verse + 1
-                next_shloka_id = f"BG{last_chapter}.{next_verse}"
+            if ':' in last_shloka_id and 'v' in last_shloka_id:
+                chapter_part, verse_part = last_shloka_id.split(':')
+                chapter = int(verse_part.split('v')[0])  
+                verse = int(verse_part.split('v')[1])
                 
-                # Check if next shloka exists
-                next_shloka = Shloka.query.get(next_shloka_id)
-                if not next_shloka:
-                    # Start from the next chapter
-                    next_chapter = last_chapter + 1
-                    next_shloka_id = f"BG{next_chapter}.1"
-                    next_shloka = Shloka.query.get(next_shloka_id)
-                    if not next_shloka:
-                        # If no next chapter, start from the beginning
-                        next_shloka_id = "BG1.1"
+                # Get the next 5 shlokas in sequence
+                next_shlokas = []
+                current_chapter = chapter
+                current_verse = verse + 1
+                
+                while len(next_shlokas) < 5:
+                    next_id = f"c:{current_chapter}v{current_verse}"
+                    next_shloka = Shloka.query.get(next_id)
+                    
+                    if next_shloka:
+                        next_shlokas.append(next_shloka)
+                        current_verse += 1
+                    else:
+                        # Move to the next chapter
+                        current_chapter += 1
+                        current_verse = 1
+                        # If we've gone through all chapters, start from the beginning
+                        if current_chapter > 18:  # There are 18 chapters in Bhagavad Gita
+                            current_chapter = 1
+                
+                if next_shlokas:
+                    selected_shlokas = next_shlokas
+                else:
+                    # Fallback to initial shlokas from chapter 1 if we couldn't find next ones
+                    selected_shlokas = get_initial_shlokas(5)
             else:
-                # For other formats, start from the beginning
-                next_shloka_id = "BG1.1"
-        except:
-            # If any parsing error, start from the beginning
-            next_shloka_id = "BG1.1"
+                # If ID format is not as expected, start from the beginning
+                selected_shlokas = get_initial_shlokas(5)
+        except Exception as e:
+            # If any error in parsing, use initial shlokas
+            print(f"Error parsing shloka ID: {e}, falling back to chapter 1")
+            selected_shlokas = get_initial_shlokas(5)
     else:
-        # If no previous shlokas, start from the beginning
-        next_shloka_id = "BG1.1"
+        # If no previous shlokas assigned, start from chapter 1
+        selected_shlokas = get_initial_shlokas(5)
     
-    # Get 5 consecutive shlokas starting from the next_shloka_id
-    selected_shlokas = Shloka.query.filter(Shloka.id >= next_shloka_id).order_by(Shloka.id).limit(5).all()
     print(f"Selected shlokas for visitor {visitor_id}: {[s.id for s in selected_shlokas]}")
-    
-    # If we don't have 5 shlokas (might be at the end of the book), 
-    # cycle back to the beginning to get the remaining
-    if len(selected_shlokas) < 5:
-        remaining_count = 5 - len(selected_shlokas)
-        remaining_shlokas = Shloka.query.order_by(Shloka.id).limit(remaining_count).all()
-        selected_shlokas.extend(remaining_shlokas)
     
     # Save the selected shlokas for this visitor for today
     selected_ids = [s.id for s in selected_shlokas]
@@ -308,5 +311,8 @@ def submit_quiz_answers(quiz_id, answers):
 
 def get_initial_shlokas(count=5):
     """Get sequential shlokas for non-authenticated users, starting from chapter 1"""
-    # For the landing page, always start from the beginning
-    return Shloka.query.order_by(Shloka.id).limit(count).all()
+    # For the landing page, always start from the beginning of chapter 1
+    # We need to ensure we get shloka IDs in the format c:1v1, c:1v2, etc.
+    first_shlokas = Shloka.query.filter(Shloka.id.like('c:1v%')).order_by(Shloka.id).limit(count).all()
+    print(f"Initial shlokas selected: {[s.id for s in first_shlokas]}")
+    return first_shlokas
