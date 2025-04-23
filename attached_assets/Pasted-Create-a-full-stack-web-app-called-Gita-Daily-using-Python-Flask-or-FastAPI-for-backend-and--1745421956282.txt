@@ -1,0 +1,57 @@
+Create a full-stack web app called **"Gita Daily"** using Python (Flask or FastAPI for backend) and modern frontend (React + TailwindCSS or HTML/CSS/JS if simpler).
+
+📁 Use the uploaded CSV file as the data source. It has:
+- `id`: unique shloka ID (e.g. c:1v1)
+- `SA`: Sanskrit shloka text
+- `EN`: English translation
+
+---
+
+🎯 **App Features:**
+
+1. **Daily Shloka Flashcards**:
+   - Show max **5 random shlokas per day** in swipeable **flashcard format** (next/prev).
+   - Front of card = `SA` (Sanskrit), back = `EN` (English).
+   - Limit reading to 5 per day per user.
+
+2. **Favorite System**:
+   - Add ❤️ button on each card.
+   - Store user's favorite shlokas using browser localStorage or backend DB (SQLite or Supabase).
+
+3. **Weekly Quiz**:
+   - Auto-generate a 7-question MCQ quiz at end of each 7-day reading cycle.
+   - Only allow next week’s content if quiz is passed.
+   - Store scores per user.
+
+4. **Progress Tracker**:
+   - Show a 7-day calendar with ✓ for each completed day.
+   - Lock quiz if all 7 days not completed.
+
+5. **Notification System**:
+   - Allow users to set a daily notification time.
+   - Use `localStorage` to store time and a JS `setInterval()` to show a pop-up reminder.
+   - Message: “🕉️ Your shloka awaits: Shloka a day keeps maya away.”
+
+6. **User Auth**:
+   - Add simple Google login using Firebase Auth or email auth (Replit Auth optional).
+   - Store user data (progress, favorites) in SQLite or Firebase Firestore.
+
+7. **UI/UX Design**:
+   - Minimalist, soothing design (light pastel tones).
+   - Rounded corners, calm animations.
+   - Mobile-first responsive design.
+   - Dark mode toggle (optional).
+
+8. **Deployment**:
+   - Deploy to Replit instantly with working preview URL.
+   - Auto-connect frontend + backend.
+   - No manual setup should be required.
+
+---
+
+🛠 Tech Stack:
+- Backend: FastAPI or Flask
+- Frontend: React + TailwindCSS OR HTML/CSS/JS
+- DB: SQLite or Firebase (for user data)
+- Auth: Firebase Auth / Replit Auth
+- CSV Parsing: Use Pandas or Python’s `csv` module
