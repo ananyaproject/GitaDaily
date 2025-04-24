@@ -1,41 +1,47 @@
-# Python bytecode
+# Bytecode & compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Environment and virtual environment
-.env
-.venv
-env/
+# Virtual environments
+.venv/
 venv/
+env/
 ENV/
+
+# Environment variables
+.env
+
+# Python version management
 .python-version
 
-# Distribution / packaging
-dist/
+# Build and packaging
 build/
+dist/
 *.egg-info/
 
-# SQLite database files
+# SQLite databases
 *.sqlite
 *.db
 
-# IDE specific files
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Replit specific
-.replit
-.config/
-.pythonlibs/
-
-# Logs and local data
+# Logs
 *.log
+
+# Flask instance folder
 instance/
 
-# Generated content
+# Coverage & test results
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Editor/IDE configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Replit
+.replit
+.config/
+.pythonlibs/
