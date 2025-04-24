@@ -18,31 +18,7 @@ A daily Bhagavad Gita flashcard application that delivers Sanskrit shlokas with 
 - **Frontend**: HTML, CSS, JavaScript
 - **Responsive Design**: Works on desktop and mobile devices
 
-## Setup and Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/gita-daily.git
-   cd gita-daily
-   ```
-
-2. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Initialize the database:
-   ```bash
-   python recreate_db.py
-   python load_data.py
-   ```
-
-4. Run the application:
-   ```bash
-   python main.py
-   ```
-
-5. Visit `http://localhost:5000` in your browser to access the application.
 
 ## Project Structure
 
