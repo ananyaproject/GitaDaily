@@ -53,7 +53,7 @@ deepface==0.0.79
 defusedxml==0.7.1
 diffusers==0.14.0
 Django==4.2.5
-dlib @ file:///C:/Users/any/Desktop/dlib-19.22.99-cp310-cp310-win_amd64.whl#sha256=f2181b6724669fb0147c9ebc326d72b94de41bced1812eff5df4b133b5d0b575
+#dlib
 easyocr==1.7.0
 ephem==4.1.4
 et-xmlfile==1.1.0
