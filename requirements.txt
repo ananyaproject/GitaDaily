@@ -3,5 +3,5 @@ Flask-SQLAlchemy==3.0.3
 pandas==1.5.3
 sqlalchemy==2.0.7
 werkzeug==2.2.3
-dlib==19.24.0  # (or the version you manually installed)
+#dlib==19.24.0  # (or the version you manually installed)
 gunicorn==20.1.0
