@@ -1,0 +1,41 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment and virtual environment
+.env
+.venv
+env/
+venv/
+ENV/
+.python-version
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# SQLite database files
+*.sqlite
+*.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Replit specific
+.replit
+.config/
+.pythonlibs/
+
+# Logs and local data
+*.log
+instance/
+
+# Generated content
+.coverage
+htmlcov/
+.pytest_cache/
