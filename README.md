@@ -1,4 +1,4 @@
-# Gita Daily
+# Gita Daily an AI App
 
 A daily Bhagavad Gita flashcard application that delivers Sanskrit shlokas with English translations in chronological order, along with progress tracking and weekly quizzes.
 
