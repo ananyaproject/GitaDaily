@@ -29,8 +29,9 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 # Create tables
-with app.app_context():
+#extra
+#with app.app_context():
     # Import models here to avoid circular imports
-    import models  # noqa: F401
-    db.create_all()
-    logging.info("Database tables created")
+    #import models  # noqa: F401
+    #db.create_all()
+    #logging.info("Database tables created")
